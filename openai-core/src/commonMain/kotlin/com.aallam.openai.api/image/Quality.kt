@@ -10,6 +10,11 @@ import kotlin.jvm.JvmInline
 @JvmInline
 public value class Quality(public val value: String) {
     public companion object {
+        public val Auto: Quality = Quality("auto")
+        public val High: Quality = Quality("high")
+        public val Medium: Quality = Quality("medium")
+        public val Low: Quality = Quality("low")
         public val HD: Quality = Quality("hd")
+        public val Standard: Quality = Quality("standard")
     }
 }

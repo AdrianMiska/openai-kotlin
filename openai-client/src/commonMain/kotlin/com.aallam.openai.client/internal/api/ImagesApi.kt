@@ -114,10 +114,15 @@ internal class ImagesApi(private val requester: HttpRequester) : Images {
         n = n,
         size = size,
         user = user,
-        responseFormat = ImageResponseFormat.base64Json,
         model = model?.id,
+        background = background,
+        outputFormat = outputFormat,
+        outputCompression = outputCompression,
+        moderation = moderation,
         quality = quality,
         style = style,
+        //TODO I don't love this
+        responseFormat = if (model?.id != "gpt-image-1") ImageResponseFormat.base64Json else null,
     )
 
     /** Convert [ImageCreation] instance to URL request */
@@ -126,9 +131,14 @@ internal class ImagesApi(private val requester: HttpRequester) : Images {
         n = n,
         size = size,
         user = user,
-        responseFormat = ImageResponseFormat.url,
         model = model?.id,
+        //TODO should we keep the gpt-image-1 only properties here even if URL Requests can't be used with it?
+        background = background,
+        outputFormat = outputFormat,
+        outputCompression = outputCompression,
+        moderation = moderation,
         quality = quality,
         style = style,
+        responseFormat = ImageResponseFormat.url,
     )
 }

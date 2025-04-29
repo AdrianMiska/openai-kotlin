@@ -6,8 +6,7 @@ import com.aallam.openai.client.internal.JsonLenient
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
-import io.ktor.utils.io.core.readAvailable
-import io.ktor.utils.io.core.writeFully
+import io.ktor.utils.io.core.*
 import kotlinx.io.buffered
 import kotlinx.serialization.json.*
 
@@ -27,7 +26,11 @@ internal inline fun <reified T> streamRequestOf(serializable: T): JsonElement {
 }
 
 internal fun FormBuilder.appendFileSource(key: String, fileSource: FileSource) {
-    append(key = key, filename = fileSource.name, contentType = ContentType.Application.OctetStream) {
+    append(
+        key = key,
+        filename = fileSource.name,
+        contentType = fileSource.contentType?.let { ContentType.parse(it) }
+            ?: ContentType.Application.OctetStream) {
         fileSource.source.buffered().use { source ->
             val buffer = ByteArray(8192) // 8 KiB
             var bytesRead: Int
@@ -35,6 +38,12 @@ internal fun FormBuilder.appendFileSource(key: String, fileSource: FileSource) {
                 writeFully(buffer = buffer, offset = 0, length = bytesRead)
             }
         }
+    }
+}
+
+internal fun FormBuilder.appendFileListSource(key: String, fileSource: List<FileSource>) {
+    fileSource.forEach { source ->
+        appendFileSource(key = "$key[]", fileSource = source)
     }
 }
 

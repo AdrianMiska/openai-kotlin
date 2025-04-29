@@ -6,6 +6,7 @@ import com.aallam.openai.api.image.*
 import com.aallam.openai.api.image.internal.ImageCreationRequest
 import com.aallam.openai.api.image.internal.ImageResponseFormat
 import com.aallam.openai.client.Images
+import com.aallam.openai.client.internal.extension.appendFileListSource
 import com.aallam.openai.client.internal.extension.appendFileSource
 import com.aallam.openai.client.internal.extension.requestOptions
 import com.aallam.openai.client.internal.http.HttpRequester
@@ -64,10 +65,14 @@ internal class ImagesApi(private val requester: HttpRequester) : Images {
      * Build image edit request.
      */
     private fun imageEditRequest(edit: ImageEdit, responseFormat: ImageResponseFormat) = formData {
-        appendFileSource("image", edit.image)
-        appendFileSource("mask", edit.mask)
+        when(val image = edit.image){
+            is ImageEditInput.ImageInput -> appendFileSource("image", image.value)
+            is ImageEditInput.ListInput -> appendFileListSource("image", image.values)
+        }
+        edit.mask?.let { appendFileSource("mask", it) }
         append(key = "prompt", value = edit.prompt)
-        append(key = "response_format", value = responseFormat.format)
+        //TODO I don't love this
+        if (edit.model?.id != "gpt-image-1") append(key = "response_format", value = responseFormat.format)
         edit.n?.let { n -> append(key = "n", value = n) }
         edit.size?.let { dim -> append(key = "size", value = dim.size) }
         edit.user?.let { user -> append(key = "user", value = user) }

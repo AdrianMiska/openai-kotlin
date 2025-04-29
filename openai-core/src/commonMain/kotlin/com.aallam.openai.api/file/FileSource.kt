@@ -20,6 +20,11 @@ public class FileSource(
      * File source.
      */
     public val source: RawSource,
+
+    /**
+     * Content type.
+     */
+    public val contentType: String? = null,
 ) {
 
     /**
@@ -53,10 +58,16 @@ public class FileSourceBuilder {
     public var source: Source? = null
 
     /**
+     * Content type.
+     */
+    public var contentType: String? = null
+
+    /**
      * Creates the [FileSource] instance
      */
     public fun build(): FileSource = FileSource(
         name = requireNotNull(name) { "name is required" },
-        source = requireNotNull(source) { "source is required" }
+        source = requireNotNull(source) { "source is required" },
+        contentType = contentType
     )
 }
